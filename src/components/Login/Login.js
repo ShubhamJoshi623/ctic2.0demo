@@ -2,14 +2,15 @@ import React from 'react'
 import '../Login/index.0626f97b.css'
 import {
     BrowserRouter as Router,
-    Link
+    Link,
+    Outlet
   } from "react-router-dom";
 
 export default function Login() {
   return (
     <>
   
-    
+    <section>
 
     <div id="div1" className="flex align-middle bg-login" >
       <div className="bg-white mt-40 mb-40 max-w-login-container ml-20 w-2/4 rounded shadow-md p-login-container h-[570px]">
@@ -72,8 +73,7 @@ export default function Login() {
       </div>
     </div>
 
-   
-
+    </section>
 
     </>
   )

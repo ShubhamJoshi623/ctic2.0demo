@@ -1,71 +1,43 @@
 import React, { useState, useEffect } from "react";
 import "../QuickRegister/index.0827da48.css";
 import { Link } from "react-router-dom";
-import Select from "react-select";
 import PasswordStrengthIndicator from "./PasswordstrengthIndicator";
 import axios, { formToJSON } from "axios";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm, Controller } from "react-hook-form";
+import { QuickRegistervalidationSchema } from "../../schemas/QuickRegisterSchema";
+import CustomSelect from "../shared/CustomSelect";
 
-export default function QuickRegister() {
+let renderCount = 0;
+
+export default function QuickRegisterHookForm() {
+  renderCount++;
+
+  const options = [
+    { label: "Select Province", value: "0" },
+    { value: "ON", label: "Ontario" },
+    { value: "AB", label: "Alberta" },
+    { value: "BC", label: "British Columbia" },
+    { value: "QC", label: "Quebec" },
+    { value: "NL", label: "NewFound Land" },
+    { value: "MB", label: "Manitoba" },
+  ];
+
   useEffect(() => {
     const response = async () => {
-      let result = await axios.get(
-        "https://my-json-server.typicode.com/ShubhamJoshi623/DemoServer/db"
+      let result = await axios.post(
+        "/api/CTICQuestionsAdmin/ReadUnifiedQuestions",
+        {
+          RequestObject: {
+            FileID: 437349,
+            LanguageCode: "en-CA",
+          },
+        }
       );
       alert(JSON.stringify(result.data));
     };
-
-    response();
-
-    // axios.get('https://my-json-server.typicode.com/ShubhamJoshi623/DemoServer/db')
-    //     .then(response => alert(JSON.stringify(response.data)))
-    //     .catch(error => {
-    //         console.error('There was an error!', error);
-    //     });
+    // response();
   }, []);
-
-  const submitPostRequest = async (data) => {
-    let response = await axios.post(
-      "https://my-json-server.typicode.com/ShubhamJoshi623/DemoServer/posts",
-      { data }
-    );
-    alert(JSON.stringify(response));
-    console.log(response);
-  };
-
-  const [Values, setValues] = useState({
-    language_type: "",
-    firmname: "",
-    firstname: "",
-    middlename: "",
-    lastname: "",
-    phonenumber: "",
-    phonenumber: "",
-    ext: "",
-    username: "",
-    password: "",
-    confirmpassword: "",
-  });
-
-  const [focused, setFocused] = useState(false);
-  const [radioBtn, setRadioBtn] = useState(null);
-
-  //   useEffect(() => {
-  //     document.body.addEventListener('click', bodyClickHandler );
-
-  //     return function cleanup() {
-  //         window.removeEventListener('click', bodyClickHandler );
-  //     }
-  // },[]);
-
-  // const bodyClickHandler=()=>{
-
-  //     setDisplay(false);
-  // }
-
-  let errorMessages = {
-    ConfmPassErrorMessage: "Passwords Don't Match",
-    requiredErrorMessage: "* Required",
-  };
 
   const [passwordValidity, setPasswordValidity] = useState({
     minChar: null,
@@ -82,22 +54,39 @@ export default function QuickRegister() {
   const LowerCaseRegx = /[a-z]/;
   const websiteNameRegex = /^((?!ctic|FNF|chicagotitle).)*$/i;
 
-  const QuickRegisterOnSubmit = (e) => {
-    handleFocus();
-    e.preventDefault();
-    const data = new FormData(e.target);
-    let formdata = Object.fromEntries(data.entries());
-    console.log(formdata);
-    submitPostRequest(formdata);
+  const onSubmit = async (test) => {
+    console.log("🚀 ~ file: TestingComp.js:14 ~ onSubmit ~ test", test);
+    let response = await axios.post(
+      "https://my-json-server.typicode.com/ShubhamJoshi623/DemoServer/posts",
+      { test }
+    );
+    alert(JSON.stringify(response));
+    console.log(response);
   };
 
-  const handleFocus = (params) => {
-    setFocused(true);
-  };
+  const {
+    register,
+    control,
+    setValue,
+    formState: { errors },
+    handleSubmit,
+  } = useForm({
+    defaultValues: {
+      firmname: "",
+      firstname: "",
+      middlename: "",
+      lastname: "",
+      phonenumber: "",
+      ext: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmpassword: "",
+    },
+    resolver: yupResolver(QuickRegistervalidationSchema),
+  });
 
   const Onchange = (e) => {
-    setValues({ ...Values, [e.target.name]: e.target.value });
-    //debugger;
     if (e.target.name == "password") validatePassword(e);
   };
 
@@ -174,12 +163,17 @@ export default function QuickRegister() {
                   Login
                 </Link>
               </div>
+              <button
+                className="text-white float-right bg-blue-700 rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+                disabled
+              >
+                Render Count : {renderCount}
+              </button>
             </header>
 
             <form
               action=""
-              onSubmit={QuickRegisterOnSubmit}
-              method="get"
+              onSubmit={handleSubmit(onSubmit)}
               className="flex-auto "
             >
               <div className="language-selector mt-6 mb-8">
@@ -194,28 +188,22 @@ export default function QuickRegister() {
                   className="custom__radio"
                   type="radio"
                   name="language_type"
-                  checked={radioBtn === "English"}
                   value="English"
-                  required={(radioBtn === "English").toString()}
-                  onClick={() => setRadioBtn("English")}
-                  focused={focused.toString()}
+                  {...register("language_type", { required: true })}
                 />
                 <label htmlFor="english_language">English</label>
                 <input
                   id="french_language"
                   className="custom__radio"
                   type="radio"
-                  checked={radioBtn === "French"}
                   name="language_type"
                   value="French"
-                  required={(radioBtn === "French").toString()}
-                  focused={focused.toString()}
-                  onClick={() => setRadioBtn("French")}
+                  {...register("language_type", { required: true })}
                 />
                 <label htmlFor="french_language">French</label>
 
-                <span className="errorMessage">
-                  {errorMessages.requiredErrorMessage}
+                <span className="text-red-600">
+                  {errors.language_type && errors.language_type.message}
                 </span>
               </div>
 
@@ -232,18 +220,14 @@ export default function QuickRegister() {
                     </label>
                     <input
                       type="text"
-                      value={Values.firmname}
-                      required="true"
                       id="law_firm"
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      onChange={Onchange}
+                      {...register("firmname")}
                       name="firmname"
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Name"
                     />
-                    <span className="errorMessage">
-                      {errorMessages.requiredErrorMessage}
+                    <span className="text-red-600">
+                      {errors.firmname && errors.firmname.message}
                     </span>
                   </div>
                 </div>
@@ -258,18 +242,14 @@ export default function QuickRegister() {
                     </label>
                     <input
                       type="text"
-                      value={Values.firstname}
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      onChange={Onchange}
                       id="first_name"
+                      {...register("firstname")}
                       name="firstname"
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="First Name"
-                      required="true"
                     />
-                    <span className="errorMessage">
-                      {errorMessages.requiredErrorMessage}
+                    <span className="text-red-600">
+                      {errors.firstname && errors.firstname.message}
                     </span>
                   </div>
 
@@ -283,14 +263,14 @@ export default function QuickRegister() {
                     </label>
                     <input
                       type="text"
-                      value={Values.middlename}
                       id="last_name"
+                      {...register("middlename")}
                       name="middlename"
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Middle Name"
                     />
-                    <span className="errorMessage">
-                      {errorMessages.middleNameErrorMessage}
+                    <span className="text-red-600">
+                      {errors.middlename && errors.middlename.message}
                     </span>
                   </div>
 
@@ -303,18 +283,14 @@ export default function QuickRegister() {
                     </label>
                     <input
                       type="text"
-                      value={Values.lastname}
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      required="true"
-                      onChange={Onchange}
                       name="lastname"
+                      {...register("lastname")}
                       id="last_name"
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Last Name"
                     />
-                    <span className="errorMessage">
-                      {errorMessages.requiredErrorMessage}
+                    <span className="text-red-600">
+                      {errors.lastname && errors.lastname.message}
                     </span>
                   </div>
                 </div>
@@ -329,18 +305,14 @@ export default function QuickRegister() {
                     </label>
                     <input
                       type="number"
-                      value={Values.phonenumber}
                       name="phonenumber"
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      required="true"
-                      onChange={Onchange}
+                      {...register("phonenumber")}
                       id="phone_num"
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="000 000 0000"
                     />
-                    <span className="errorMessage">
-                      {errorMessages.requiredErrorMessage}
+                    <span className="text-red-600">
+                      {errors.phonenumber && errors.phonenumber.message}
                     </span>
                   </div>
                   <div className="w-[90px] mr-4">
@@ -352,18 +324,14 @@ export default function QuickRegister() {
                     </label>
                     <input
                       type="number"
-                      value={Values.ext}
                       name="ext"
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      required="true"
-                      onChange={Onchange}
+                      {...register("ext")}
                       id="ext_num"
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="0000"
                     />
-                    <span className="errorMessage">
-                      {errorMessages.requiredErrorMessage}
+                    <span className="text-red-600">
+                      {errors.ext && errors.ext.message}
                     </span>
                   </div>
 
@@ -376,10 +344,15 @@ export default function QuickRegister() {
                     </label>
                     <input
                       type="email"
+                      name="email"
                       id="email"
+                      {...register("email")}
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="0000000"
                     />
+                    <span className="text-red-600">
+                      {errors.email && errors.email.message}
+                    </span>
                   </div>
                 </div>
 
@@ -392,41 +365,39 @@ export default function QuickRegister() {
                   </div>
                   <div className="custom__dropdown-wrapper w-[276px] ">
                     <select
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      required="true"
-                      onChange={Onchange}
                       className="custom__dropdown "
+                      name="Province"
+                      {...register("Province")}
                     >
-                      <option>Some option</option>
-                      <option>Other option</option>
-                      <option>Other option</option>
-                      <option>Other option</option>
-                      <option>Other option</option>
+                      <option>ON</option>
+                      <option>AB</option>
+                      <option>BC</option>
+                      <option>MB</option>
+                      <option>QC</option>
                     </select>
                   </div>
-
-                  {/* <div className="custom__dropdown-wrapper w-[276px]">
-                            <button id="dropdownProvince" data-dropdown-toggle="province_dropdown" aria-labelledby="dropdownProvince" className="custom__dropdown rounded-[2px]  px-4 py-2.5 text-center inline-flex items-center" type="button">
-                                    <span className="current__label-value">Ontario</span> <svg className="w-4 h-4 ml-2" aria-hidden="true" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </button>
-                            <div id="province_dropdown" className="custom__dropdown-options z-10 hidden">
-                                <ul aria-labelledby="dropdownProvince">
-                                    <li tabIndex="0" className="block px-4 py-2" id="option-alberta" data-value="alberta">
-                                        Alberta
-                                    </li>
-                                    <li tabIndex="0" className="block px-4 py-2" id="option-bc" data-value="british-columbia">
-                                        British Columbia
-                                    </li>
-                                    <li tabIndex="0" className="block px-4 py-2" id="option-ontario" data-value="ontario">
-                                        Ontario
-                                    </li>
-                                </ul>
-                            </div>
-                        </div> */}
                 </div>
+
+                <Controller
+                  control={control}
+                  name="provinceSelect"
+                  render={({
+                    field: { onChange, onBlur, value, name, ref },
+                  }) => (
+                    <CustomSelect
+                      onBlur={onBlur} // notify when input is touched
+                      onChange={onChange} // send value to hook form
+                      checked={value}
+                      inputRef={ref}
+                      value={value}
+                      name="provinceSelect"
+                      options={options}
+                    />
+                  )}
+                />
+                <span className="text-red-600">
+                  {errors.provinceSelect && errors.provinceSelect.message}
+                </span>
 
                 <hr className="my-6" />
 
@@ -439,19 +410,15 @@ export default function QuickRegister() {
                       Username
                     </label>
                     <input
-                      value={Values.username}
                       name="username"
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      required="true"
-                      onChange={Onchange}
                       type="text"
                       id="username"
+                      {...register("username")}
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       placeholder="Username"
                     />
-                    <span className="errorMessage">
-                      {errorMessages.requiredErrorMessage}
+                    <span className="text-red-600">
+                      {errors.username && errors.username.message}
                     </span>
                   </div>
                   <div className="w-[200px] mr-4">
@@ -470,32 +437,19 @@ export default function QuickRegister() {
                       Password
                     </label>
                     <input
-                      value={Values.password}
                       name="password"
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      required="true"
-                      //   required="false"
-                      onChange={Onchange}
-                      //  pattern={"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])(?!ctic|FNF|chicagotitle).{8,}$"}
-                      //  pattern={"^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)|(?ctic|FNF|chicagotitle)*/i$"}
-                      minLength={
-                        passwordValidity.minChar &&
-                        passwordValidity.lowerCase &&
-                        passwordValidity.upperCase &&
-                        passwordValidity.number &&
-                        passwordValidity.specialChar &&
-                        passwordValidity.websiteName
-                          ? "8"
-                          : "999"
-                      }
                       type="password"
                       id="password_quickregister"
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       placeholder="Password"
+                      {...register("password", {
+                        onChange: (e) => {
+                          Onchange(e);
+                        },
+                      })}
                     />
-                    <span className="errorMessage">
-                      {errorMessages.requiredErrorMessage}
+                    <span className="text-red-600">
+                      {errors.password && errors.password.message}
                     </span>
 
                     <label
@@ -505,20 +459,15 @@ export default function QuickRegister() {
                       Confirm Password
                     </label>
                     <input
-                      value={Values.confirmpassword}
                       name="confirmpassword"
-                      onBlur={handleFocus}
-                      focused={focused.toString()}
-                      required="true"
-                      onChange={Onchange}
                       type="password"
                       id="password"
+                      {...register("confirmpassword")}
                       className="border text-gray-900 text-sm rounded-[2px] focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
                       placeholder="Confirm Password"
-                      pattern={Values.password}
                     />
-                    <span className="errorMessage">
-                      {errorMessages.ConfmPassErrorMessage}
+                    <span className="text-red-600">
+                      {errors.confirmpassword && errors.confirmpassword.message}
                     </span>
                   </div>
 

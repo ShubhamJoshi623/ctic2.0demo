@@ -387,5 +387,29 @@ input:invalid[focused="true"] ~ .errorMessage{
 
   max-height: 180px;
 }
+select {
+
+  /* styling */
+  background-color: white;
+  border: thin solid blue;
+  border-radius: 4px;
+  display: inline-block;
+  font: inherit;
+  line-height: 1.5em;
+  padding: 0.3em 0.5em 0.5em 1em;
+  font-size:18px;
+
+  /* reset */
+
+  margin: 0;      
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+
+
 /*  */
 /*# sourceMappingURL=index.0827da48.css.map */

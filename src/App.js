@@ -1,10 +1,9 @@
 import './css/index.47ca9330.css';
 import './css/index.3ca998d7.css';
-import Headernavbar from './components/Headernavbar';
-import Footer from './components/Footer';
+
 
 import {
-  BrowserRouter as Router,
+  BrowserRouter ,
   Route,
   Routes,
   Link
@@ -16,37 +15,37 @@ import Registration from './components/Registration/Registration';
 import Login from './components/Login/Login';
 import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 import Dashboard from './components/Dashboard/Dashboard';
+import TestingComp from './components/TestingComp/TestingComp';
+import Mainheader from './components/Mainheader';
+import ReactHookForm from './components/TestingComp/ReactHookForm';
+import FormikFormDemo from './components/TestingComp/FormikFormDemo';
+import QuickRegisterHookForm from './components/QuickRegister/QuickRegisterHookForm';
+import ReactHookDynamicForm from './components/TestingComp/ReactHookDynamicForm';
+
 
 
 
 function App() {
   return (
     <>
-<Router>
-
-<Headernavbar/>
-
-    
+<BrowserRouter>
 
     <Routes>
-      <Route exact path="/" element={<Home/>}/>
-      <Route exact path="/login" element={<Login/>}/>
-      <Route exact path="/ForgotPassword" element={<ForgotPassword/>}/>
-      <Route exact path="/quickregister" element={<QuickRegister/>}/>
-      <Route exact path="/registration" element={<Registration/>}/>
-      <Route exact path="/Dashboard" element={<Dashboard/>}/>
-
-
-     
+      <Route  path="/" element={<Mainheader/>}>
+      <Route index element={<Home/>}/>
+      <Route  path="login" element={<Login/>}/>
+      <Route  path="ForgotPassword" element={<ForgotPassword/>}/>
+      <Route  path="quickregister" element={<QuickRegister/>}/>
+      <Route  path="QuickRegisterHookForm" element={<QuickRegisterHookForm/>}/>
+      <Route  path="registration" element={<Registration/>}/>
+      <Route  path="Dashboard" element={<Dashboard/>}/>
+      <Route  path="TestingComp" element={<TestingComp/>}/>
+      <Route  path="ReactHookForm" element={<ReactHookForm/>}/>
+      <Route  path="ReactHookDynamicForm" element={<ReactHookDynamicForm/>}/>
+      <Route  path="FormikFormDemo" element={<FormikFormDemo/>}/>
+      </Route>
     </Routes>
-  
-              
-    
-   <Footer/>
-
-   
-
-    </Router>
+    </BrowserRouter>
     </>
   );
 }
